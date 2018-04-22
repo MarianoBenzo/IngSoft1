@@ -160,13 +160,23 @@ Node subclass: #NodeBase
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!NodeBase methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:48:39'!
+!NodeBase methodsFor: 'as yet unclassified' stamp: 'MB 4/22/2018 02:43:25'!
 getElement
-	^ self error: OOStack stackEmptyErrorDescription.! !
+	^ self error: NodeBase nodeBaseGetElementErrorDescription.! !
 
 !NodeBase methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:16:26'!
 isEmpty
 	^ true.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'NodeBase class' category: #'Stack-Exercise'!
+NodeBase class
+	instanceVariableNames: ''!
+
+!NodeBase class methodsFor: 'as yet unclassified' stamp: 'MB 4/22/2018 02:42:26'!
+nodeBaseGetElementErrorDescription
+	^ 'Node Base has no element'.! !
 
 
 !classDefinition: #NodeElement category: #'Stack-Exercise'!
@@ -221,12 +231,16 @@ initialize
 isEmpty
 	^ top isEmpty! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:33:41'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MB 4/22/2018 02:46:35'!
 pop
 
 	| popElement |
 	
-	popElement := top getElement.
+	[popElement := top getElement]
+	
+	on: Error
+	do: [^ self error: OOStack stackEmptyErrorDescription].
+	
 	top := top getPrevious.
 	size := size - 1.
 	
@@ -246,9 +260,11 @@ push: element
 size
 	^ size.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:31:49'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MB 4/22/2018 02:47:43'!
 top
-	^ top getElement.! !
+	[^ top getElement]
+	on: Error
+	do: [^ self error: OOStack stackEmptyErrorDescription].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
