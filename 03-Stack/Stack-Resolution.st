@@ -194,9 +194,9 @@ getElement
 getPrevious
 	^ previous.! !
 
-!NodeElement methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:19:19'!
-initializeWithElement: aElement previous: aNode
-	element := aElement.
+!NodeElement methodsFor: 'as yet unclassified' stamp: 'MB 4/23/2018 21:16:03'!
+initializeWithElement: anElement previous: aNode
+	element := anElement.
 	previous := aNode.! !
 
 !NodeElement methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:20:43'!
@@ -209,9 +209,9 @@ isEmpty
 NodeElement class
 	instanceVariableNames: ''!
 
-!NodeElement class methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:23:08'!
-withElement: aElement previous: aNode
-	^ self new initializeWithElement: aElement previous: aNode! !
+!NodeElement class methodsFor: 'as yet unclassified' stamp: 'MB 4/23/2018 21:17:54'!
+withElement: anElement previous: aNode
+	^ self new initializeWithElement: anElement previous: aNode! !
 
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
@@ -246,11 +246,11 @@ pop
 	
 	^ popElement.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:33:15'!
-push: element
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MB 4/23/2018 21:17:30'!
+push: anElement
 	| newElement |
 	
-	newElement := NodeElement withElement: element previous: top. 
+	newElement := NodeElement withElement: anElement previous: top. 
 	
 	top := newElement.
 	
@@ -278,6 +278,6 @@ stackEmptyErrorDescription
 	^ 'Stack is empty'! !
 
 
-!OOStack class methodsFor: 'as yet unclassified' stamp: 'MB 4/21/2018 18:02:43'!
+!OOStack class methodsFor: 'as yet unclassified' stamp: 'MB 4/23/2018 21:15:39'!
 new
-	^ self basicNew initialize! !
+	^ super new initialize.! !
