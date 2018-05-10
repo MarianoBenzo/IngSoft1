@@ -115,6 +115,16 @@ test08PortfolioKnowsTransactionsRegisteredByItsManagedAccounts
 	self assert: (composedPortfolio registers: deposit2).
 	self assert: (composedPortfolio registers: deposit3).! !
 
+!PortfolioTest methodsFor: 'tests' stamp: 'PF 5/10/2018 15:16:24'!
+test10ReceptiveAccountManageItSelf 
+
+	| account1 |
+	
+	account1 := ReceptiveAccount new.
+		
+	self assert: (account1 manages:account1).
+! !
+
 !PortfolioTest methodsFor: 'tests' stamp: 'HernanWilkinson 9/12/2011 13:24'!
 test11ReceptiveAccountDoNotManageOtherAccount
 
