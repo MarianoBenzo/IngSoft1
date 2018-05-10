@@ -397,6 +397,11 @@ accounts
 
 	self subclassResponsibility ! !
 
+!SummarizingAccount methodsFor: 'accounts' stamp: 'PF 5/10/2018 15:04:14'!
+allAccountsOfAllAcountsInOneBag
+
+	self subclassResponsibility ! !
+
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
@@ -473,20 +478,30 @@ accounts
 
 	^accounts copy! !
 
+!Portfolio methodsFor: 'accounts' stamp: 'PF 5/10/2018 14:59:07'!
+allAccountsOfAllAcountsInOneBag
+
+	|accountsBag|	
+	accountsBag := Bag new.
+	
+	accounts do: [:account | accountsBag add: account. accountsBag addAll: account allAccountsOfAllAcountsInOneBag ].
+	
+	^accountsBag copy! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'PF 5/10/2018 11:55:15'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'PF 5/10/2018 15:02:03'!
 throwErrorIfRepeatedAccounts: accountsBag
 
 	|allAccounts|
 	
 	allAccounts := Bag new.
 	
-	accountsBag do: [:account |  allAccounts add: account. allAccounts addAll: account accounts].
+	accountsBag do: [:account | allAccounts add: account. allAccounts addAll: account allAccountsOfAllAcountsInOneBag].
 		
 	allAccounts size = allAccounts asSet size ifFalse: [  self error: self accountAlreadyManagedErrorMessage]! !
 
@@ -579,3 +594,8 @@ registers: aTtransaction
 accounts
 
 	^Set new.! !
+
+!ReceptiveAccount methodsFor: 'accounts' stamp: 'PF 5/10/2018 14:56:56'!
+allAccountsOfAllAcountsInOneBag
+
+	^self accounts.! !
