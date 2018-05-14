@@ -741,9 +741,22 @@ register: aValue on: account
 	^ withdraw! !
 
 
-!classDefinition: #TransferDeposit category: #'PortfolioTreePrinter-Ejercicio'!
-AccountTransaction subclass: #TransferDeposit
+!classDefinition: #TransferTransaction category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransaction subclass: #TransferTransaction
 	instanceVariableNames: 'transfer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!TransferTransaction methodsFor: 'as yet unclassified' stamp: 'pf 5/14/2018 11:47:46'!
+applyTo: anAmmount
+
+	^self subclassResponsibility ! !
+
+
+!classDefinition: #TransferDeposit category: #'PortfolioTreePrinter-Ejercicio'!
+TransferTransaction subclass: #TransferDeposit
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
@@ -783,8 +796,8 @@ with: aTransfer
 
 
 !classDefinition: #TransferWithdraw category: #'PortfolioTreePrinter-Ejercicio'!
-AccountTransaction subclass: #TransferWithdraw
-	instanceVariableNames: 'transfer'
+TransferTransaction subclass: #TransferWithdraw
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
@@ -882,16 +895,20 @@ Object subclass: #AccountTransfers
 AccountTransfers class
 	instanceVariableNames: ''!
 
-!AccountTransfers class methodsFor: 'transfer net' stamp: 'MB 5/13/2018 15:30:08'!
+!AccountTransfers class methodsFor: 'transfer net' stamp: 'pf 5/14/2018 11:50:40'!
 transferNetOf: anAccount
 
 	| transferNet |
 	
 	transferNet := 0.
 	
-	anAccount transactions do: [ :transaction | 
+	"anAccount transactions do: [ :transaction | 
 		transaction class = TransferDeposit ifTrue: [ transferNet := transferNet + transaction value].
-		transaction class = TransferWithdraw ifTrue: [ transferNet := transferNet - transaction value]].
+		transaction class = TransferWithdraw ifTrue: [ transferNet := transferNet - transaction value]]."
+
+(anAccount transactions select: [:transaction | transaction isKindOf: TransferTransaction]) do: [:transaction | transferNet:= transaction applyTo: transferNet].
+
+
 	
 	^ transferNet ! !
 
