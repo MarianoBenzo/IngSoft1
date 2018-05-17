@@ -545,53 +545,53 @@ initializeWith: anAccount
 	account := anAccount.! !
 
 
-!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/14/2018 22:42:25'!
+!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/17/2018 13:47:55'!
 applyForCertificateOfDeposit: aCertificateOfDeposit
 
-	| print |
+	| line |
 	
-	print := 'Plazo fijo por ', aCertificateOfDeposit value printString, ' durante ', aCertificateOfDeposit numberOfDays printString, ' dias a una tna de ', ( aCertificateOfDeposit tna * 100 ) printString, '%'.
+	line := 'Plazo fijo por ', aCertificateOfDeposit value printString, ' durante ', aCertificateOfDeposit numberOfDays printString, ' dias a una tna de ', ( aCertificateOfDeposit tna * 100 ) printString, '%'.
 	
-	summary add: print! !
+	summary add: line! !
 
-!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/14/2018 22:13:29'!
+!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/17/2018 13:48:04'!
 applyForDeposit: aDeposit
 
-	| print |
+	| line |
 	
-	print := 'Deposito por ', aDeposit value printString.
+	line := 'Deposito por ', aDeposit value printString.
 	
-	summary add: print! !
+	summary add: line! !
 
-!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/14/2018 22:13:49'!
+!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/17/2018 13:48:12'!
 applyForTransferDeposit: aTransferDeposit
 	
-	| print |
+	| line |
 	
-	print := 'Transferencia por ', aTransferDeposit value printString.
+	line := 'Transferencia por ', aTransferDeposit value printString.
 	
-	summary add: print
+	summary add: line
 ! !
 
-!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/14/2018 22:15:06'!
+!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/17/2018 13:48:19'!
 applyForTransferWithdraw: aTransferWithdraw
 	
-	| print |
+	| line |
 	
-	print := 'Transferencia por -', aTransferWithdraw value printString.
+	line := 'Transferencia por -', aTransferWithdraw value printString.
 	
-	summary add: print
+	summary add: line
 	
 	! !
 
-!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/14/2018 22:15:28'!
+!AccountSummaryLines methodsFor: 'appliers' stamp: 'MB 5/17/2018 13:48:26'!
 applyForWithdraw: aWithdraw
 
-	| print |
+	| line |
 	
-	print := 'Extraccion por ', aWithdraw value printString.
+	line := 'Extraccion por ', aWithdraw value printString.
 	
-	summary add: print! !
+	summary add: line! !
 
 
 !AccountSummaryLines methodsFor: 'value' stamp: 'PF 5/17/2018 12:27:13'!
@@ -818,7 +818,6 @@ applyTo: anAmount
 applyYouserlfOn: aMethodObject
 	aMethodObject applyForTransferDeposit: self.! !
 
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TransferDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -837,7 +836,6 @@ TransferLeg subclass: #TransferWithdraw
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
-
 
 !TransferWithdraw methodsFor: 'operation' stamp: 'MB 5/10/2018 20:54:10'!
 applyTo: anAmount
