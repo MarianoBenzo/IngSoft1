@@ -594,13 +594,11 @@ applyForWithdraw: aWithdraw
 	summary add: print! !
 
 
-!AccountSummaryLines methodsFor: 'value' stamp: 'MB 5/14/2018 22:39:20'!
+!AccountSummaryLines methodsFor: 'value' stamp: 'PF 5/17/2018 12:27:13'!
 value
-	
-	summary := OrderedCollection new.
-	
-	account transactions do: [ :transaction | transaction applyWith: self ].
-	
+	summary _ OrderedCollection new.
+	account transactionsDo: [ :transaction |
+		transaction applyYouserlfOn: self ].
 	^ summary.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -628,9 +626,13 @@ value
 	self subclassResponsibility ! !
 
 
-!AccountTransaction methodsFor: 'operation' stamp: 'MB 5/10/2018 19:02:56'!
+!AccountTransaction methodsFor: 'operation' stamp: 'PF 5/17/2018 12:29:51'!
 applyTo: anAmount
+	^ self subclassResponsibility
+! !
 
+!AccountTransaction methodsFor: 'operation' stamp: 'PF 5/17/2018 12:08:14'!
+applyYourselfOn: aMethodObjet
 	^ self subclassResponsibility
 ! !
 
@@ -673,9 +675,8 @@ applyTo: anAmount
 	
 	^ anAmount - value.! !
 
-!CertificateOfDeposit methodsFor: 'operation' stamp: 'MB 5/14/2018 18:58:06'!
-applyWith: aMethodObject
-
+!CertificateOfDeposit methodsFor: 'operation' stamp: 'PF 5/17/2018 12:04:27'!
+applyYouserlfOn: aMethodObject
 	aMethodObject applyForCertificateOfDeposit: self.! !
 
 
@@ -740,9 +741,8 @@ applyTo: anAmount
 	
 	^ anAmount + self value! !
 
-!Deposit methodsFor: 'operation' stamp: 'MB 5/14/2018 18:57:12'!
-applyWith: aMethodObject
-
+!Deposit methodsFor: 'operation' stamp: 'PF 5/17/2018 12:04:27'!
+applyYouserlfOn: aMethodObject
 	aMethodObject applyForDeposit: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -774,8 +774,30 @@ AccountTransaction subclass: #TransferLeg
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!TransferLeg methodsFor: 'as yet unclassified' stamp: 'pf 5/14/2018 11:47:46'!
+!TransferLeg methodsFor: 'initialization' stamp: 'PF 5/17/2018 11:54:52'!
+initializeWith: aTransfer
+	
+	transfer := aTransfer! !
+
+
+!TransferLeg methodsFor: 'transfer' stamp: 'PF 5/17/2018 11:53:21'!
+transfer
+	
+	^transfer.! !
+
+!TransferLeg methodsFor: 'transfer' stamp: 'PF 5/17/2018 11:55:56'!
+value
+
+	^ transfer value! !
+
+
+!TransferLeg methodsFor: 'operation' stamp: 'pf 5/14/2018 11:47:46'!
 applyTo: anAmmount
+
+	^self subclassResponsibility ! !
+
+!TransferLeg methodsFor: 'operation' stamp: 'PF 5/17/2018 12:07:36'!
+applyYourselfOn: aMethodObject
 
 	^self subclassResponsibility ! !
 
@@ -792,27 +814,10 @@ applyTo: anAmount
 	
 	^ anAmount + transfer value! !
 
-!TransferDeposit methodsFor: 'operation' stamp: 'MB 5/14/2018 18:57:51'!
-applyWith: aMethodObject
-
+!TransferDeposit methodsFor: 'operation' stamp: 'PF 5/17/2018 12:04:27'!
+applyYouserlfOn: aMethodObject
 	aMethodObject applyForTransferDeposit: self.! !
 
-
-!TransferDeposit methodsFor: 'initialization' stamp: 'MB 5/10/2018 20:37:34'!
-initializeWith: aTransfer
-	
-	transfer := aTransfer! !
-
-
-!TransferDeposit methodsFor: 'transfer' stamp: 'MB 5/10/2018 20:59:06'!
-transfer
-	
-	^transfer.! !
-
-!TransferDeposit methodsFor: 'transfer' stamp: 'MB 5/13/2018 15:16:39'!
-value
-
-	^ transfer value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -833,32 +838,15 @@ TransferLeg subclass: #TransferWithdraw
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!TransferWithdraw methodsFor: 'initialization' stamp: 'MB 5/10/2018 20:43:25'!
-initializeWith: aTransfer
-	
-	transfer := aTransfer! !
-
 
 !TransferWithdraw methodsFor: 'operation' stamp: 'MB 5/10/2018 20:54:10'!
 applyTo: anAmount
 	
 	^ anAmount - transfer value! !
 
-!TransferWithdraw methodsFor: 'operation' stamp: 'MB 5/14/2018 18:57:37'!
-applyWith: aMethodObject
-
+!TransferWithdraw methodsFor: 'operation' stamp: 'PF 5/17/2018 12:04:27'!
+applyYouserlfOn: aMethodObject
 	aMethodObject applyForTransferWithdraw: self.! !
-
-
-!TransferWithdraw methodsFor: 'transfer' stamp: 'MB 5/10/2018 20:58:55'!
-transfer
-	
-	^transfer.! !
-
-!TransferWithdraw methodsFor: 'transfer' stamp: 'MB 5/13/2018 15:16:32'!
-value
-
-	^ transfer value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -879,9 +867,8 @@ AccountTransaction subclass: #Withdraw
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!Withdraw methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:46'!
+!Withdraw methodsFor: 'initialization' stamp: 'PF 5/17/2018 12:25:49'!
 initializeFor: aValue
-
 	value := aValue ! !
 
 
@@ -891,14 +878,12 @@ value
 	^ value ! !
 
 
-!Withdraw methodsFor: 'operation' stamp: 'MB 5/10/2018 19:04:00'!
+!Withdraw methodsFor: 'operation' stamp: 'PF 5/17/2018 12:17:42'!
 applyTo: anAmount
-	
 	^ anAmount - self value ! !
 
-!Withdraw methodsFor: 'operation' stamp: 'MB 5/14/2018 18:57:26'!
-applyWith: aMethodObject
-
+!Withdraw methodsFor: 'operation' stamp: 'PF 5/17/2018 12:04:27'!
+applyYouserlfOn: aMethodObject
 	aMethodObject applyForWithdraw: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -956,13 +941,11 @@ applyForTransferWithdraw: aTransferWithdraw
 applyForWithdraw: aWithdraw! !
 
 
-!AccountTransferNet methodsFor: 'value' stamp: 'MB 5/14/2018 22:39:28'!
+!AccountTransferNet methodsFor: 'value' stamp: 'PF 5/17/2018 12:27:41'!
 value
-	
-	net := 0.
-	
-	account transactions do: [ :transaction | transaction applyWith: self ].
-	
+	net _ 0.
+	account transactionsDo: [ :transaction |
+		transaction applyYouserlfOn: self ].
 	^ net.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1009,13 +992,11 @@ applyForTransferWithdraw: aTransferWithdraw
 applyForWithdraw: aWithdraw! !
 
 
-!InvestmentEarnings methodsFor: 'value' stamp: 'MB 5/14/2018 22:59:39'!
+!InvestmentEarnings methodsFor: 'value' stamp: 'PF 5/17/2018 12:27:55'!
 value
-	
-	earnings := 0.
-	
-	account transactions do: [ :transaction | transaction applyWith: self ].
-	
+	earnings _ 0.
+	account transactionsDo: [ :transaction |
+		transaction applyYouserlfOn: self ].
 	^ earnings.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1062,13 +1043,11 @@ applyForTransferWithdraw: aTransferWithdraw
 applyForWithdraw: aWithdraw! !
 
 
-!InvestmentNet methodsFor: 'value' stamp: 'MB 5/14/2018 22:47:53'!
+!InvestmentNet methodsFor: 'value' stamp: 'PF 5/17/2018 12:28:02'!
 value
-	
-	net := 0.
-	
-	account transactions do: [ :transaction | transaction applyWith: self ].
-	
+	net _ 0.
+	account transactionsDo: [ :transaction |
+		transaction applyYouserlfOn: self ].
 	^ net.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1131,15 +1110,16 @@ initializeFor: aPortfolio with: aDictionaryOfAccountNames
 	dictionaryOfAccounts := aDictionaryOfAccountNames.! !
 
 
-!PortfolioTree methodsFor: 'printing' stamp: 'PF 5/15/2018 16:13:53'!
+!PortfolioTree methodsFor: 'printing' stamp: 'PF 5/17/2018 12:14:42'!
 addPortfolio: aPortfolio atLevel: level withAccounts: directChildAccounts
-
-	output add: (self prependBlanckSpaceTo: (dictionaryOfAccounts at: aPortfolio) withSize: level).		
-	directChildAccounts do: [:child | child dispatchMessageFor: self atLevel: level + 1].
-		
-		 
-	
-	! !
+	output add:
+		(self
+			prependBlanckSpaceTo: (dictionaryOfAccounts at: aPortfolio)
+			withSize: level).
+	directChildAccounts do: [ :child |
+		child
+			addYourselfTo: self
+			atLevel: level + 1 ].! !
 
 !PortfolioTree methodsFor: 'printing' stamp: 'PF 5/15/2018 16:11:03'!
 addReceptiveAccount: anAccount atLevel: level
@@ -1167,16 +1147,13 @@ prependBlanckSpaceTo: aString withSize: sizeOfBlankSpace
 
 	^blankSpace, aString! !
 
-!PortfolioTree methodsFor: 'printing' stamp: 'PF 5/15/2018 15:49:18'!
+!PortfolioTree methodsFor: 'printing' stamp: 'PF 5/17/2018 12:14:42'!
 value
-	
-	output := OrderedCollection new.
-	
-	portfolio dispatchMessageFor: self atLevel: 0.	
-	
-	^output
-	
-	! !
+	output _ OrderedCollection new.
+	portfolio
+		addYourselfTo: self
+		atLevel: 0.
+	^ output.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1218,10 +1195,10 @@ transactions
 
 	self subclassResponsibility ! !
 
-!SummarizingAccount methodsFor: 'transactions' stamp: 'MB 5/14/2018 22:05:49'!
+!SummarizingAccount methodsFor: 'transactions' stamp: 'PF 5/17/2018 12:22:56'!
 transactionsDo: aClousure
 	
-	self subclassResponsibility! !
+	self transactions do: aClousure! !
 
 
 !SummarizingAccount methodsFor: 'accounts' stamp: 'MB 5/14/2018 22:04:38'!
@@ -1272,11 +1249,6 @@ transactions
 		into: [ :transactions :account | transactions addAll: account transactions. transactions ]) copy.
 	! !
 
-!Portfolio methodsFor: 'transactions' stamp: 'MB 5/14/2018 22:07:20'!
-transactionsDo: aClousure
-	
-	self transactions do: [aClousure value]! !
-
 !Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 19:27'!
 transactionsOf: anAccount 
 
@@ -1310,10 +1282,12 @@ initializeWithAll: aCollectionOfAccounts
 	accounts := aCollectionOfAccounts   ! !
 
 
-!Portfolio methodsFor: 'double dispatch' stamp: 'PF 5/15/2018 15:30:35'!
-dispatchMessageFor: aMethodObject atLevel: level
-
-	aMethodObject addPortfolio: self atLevel: level withAccounts: accounts copy! !
+!Portfolio methodsFor: 'double dispatch' stamp: 'PF 5/17/2018 12:14:42'!
+addYourselfTo: aMethodObject atLevel: level
+	aMethodObject
+		addPortfolio: self
+		atLevel: level
+		withAccounts: accounts copy.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1396,15 +1370,10 @@ register: aTransaction
 	transactions add: aTransaction 
 ! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-transactions 
-
-	^ transactions copy! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'MB 5/14/2018 22:06:45'!
-transactionsDo: aClousure
-	
-	transactions do: [aClousure value]! !
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'PF 5/17/2018 12:25:11'!
+transactions
+	^transactions copy.
+	! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
@@ -1426,15 +1395,11 @@ accounts
 	^ Bag with: self! !
 
 
-!ReceptiveAccount methodsFor: 'double dispatch' stamp: 'PF 5/15/2018 14:41:00'!
-dispatchMessageFor: aMethodObject
-
-	aMethodObject addReceptiveAccount: self! !
-
-!ReceptiveAccount methodsFor: 'double dispatch' stamp: 'PF 5/15/2018 14:53:54'!
-dispatchMessageFor: aMethodObject atLevel: level
-
-	aMethodObject addReceptiveAccount: self atLevel: level.! !
+!ReceptiveAccount methodsFor: 'double dispatch' stamp: 'PF 5/17/2018 12:14:42'!
+addYourselfTo: aMethodObject atLevel: level
+	aMethodObject
+		addReceptiveAccount: self
+		atLevel: level.! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1456,9 +1421,8 @@ initializeWith: aValue from: anAccount1 to: anAccount2
 	! !
 
 
-!Transfer methodsFor: 'value' stamp: 'MB 5/10/2018 20:53:41'!
+!Transfer methodsFor: 'value' stamp: 'PF 5/17/2018 12:28:54'!
 value
-	
 	^ value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
