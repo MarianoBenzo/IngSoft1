@@ -1317,21 +1317,6 @@ execute
 	
 	finalClosure value.! !
 
-!ParallelExecuter methodsFor: 'as yet unclassified' stamp: 'PF 5/22/2018 13:53:13'!
-executeFirstTheseClosuresInParallel: closuresToExecute thenExecute: finalClosure
-
-	|semaphore closuresCount|
-
-	semaphore := Semaphore new.
-	
- 	closuresToExecute do: [:aClosure | [aClosure value. semaphore signal.] fork. ].
-	
-	closuresCount := closuresToExecute size.
-	
-	closuresCount timesRepeat: [semaphore wait].
-	
-	finalClosure value.! !
-
 !ParallelExecuter methodsFor: 'as yet unclassified' stamp: 'PF 5/22/2018 13:59:06'!
 initializeWith: closuresCollection and: aClosure
 
