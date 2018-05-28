@@ -590,32 +590,21 @@ initializeFor: aReceptiveAccount
 	account := aReceptiveAccount ! !
 
 
-!AccountSummaryWithAllInvestmentInformation methodsFor: 'evaluating' stamp: 'pf 5/21/2018 15:41:36'!
+!AccountSummaryWithAllInvestmentInformation methodsFor: 'evaluating' stamp: 'PF 5/22/2018 14:06:32'!
 lines 
-
-	"| lines investmentEarningLines semaphore |
-	
-	semaphore := Semaphore new.
-	
-	[investmentEarningLines := (InvestmentNetVisitor for: account) value. semaphore signal.] fork.
-	[lines := (AccountSummaryWithInvestmentEarnings for: account) lines. semaphore signal.] fork.
-	2 timesRepeat: [semaphore wait].
-	lines add: 'Inversiones por ', investmentEarningLines value printString.
-	
-	 ^ lines"
 	
 	|executer parallelClosures investmentNetValue lines finalClosure |
 	
-	executer := ParallelExecuter new.
-	
-	parallelClosures := OrderedCollection new.
-	
+	parallelClosures  := OrderedCollection  new.
+		
 	parallelClosures add: [investmentNetValue := (InvestmentNetVisitor for: account) value].
 	parallelClosures add: [lines := (AccountSummaryWithInvestmentEarnings for: account) lines].
 	
 	finalClosure:=  [lines add: 'Inversiones por ', investmentNetValue  printString].
+		
+	executer := ParallelExecuter forParallelClosures: parallelClosures andNonParallelFinalClosure: finalClosure.
 	
-	executer executeFirstTheseClosuresInParallel: parallelClosures thenExecute:finalClosure.
+	executer execute.
 	
 	^ lines.
 	
@@ -646,33 +635,21 @@ initializeFor: aReceptiveAccount
 	account := aReceptiveAccount ! !
 
 
-!AccountSummaryWithInvestmentEarnings methodsFor: 'evaluating' stamp: 'pf 5/21/2018 15:41:05'!
+!AccountSummaryWithInvestmentEarnings methodsFor: 'evaluating' stamp: 'PF 5/22/2018 14:08:46'!
 lines 
-
-"	| lines investmentEarningLines semaphore |
 	
-	semaphore := Semaphore new.
-	
-	[investmentEarningLines := (InvestmentEarningVisitor for: account) value. semaphore signal.] fork.
-	[lines := (AccountSummary for: account) lines. semaphore signal.] fork.
-	2 timesRepeat: [semaphore wait.].
-	lines add: 'Ganancias por ', investmentEarningLines printString.
-	
-	 ^ lines"
-	
-	
-	|executer parallelClosures investmentNetValue lines finalClosure |
-	
-	executer := ParallelExecuter new.
-	
+	|executer parallelClosures investmentEarningLines lines finalClosure |
+		
 	parallelClosures := OrderedCollection new.
+		
+	parallelClosures add: [investmentEarningLines := (InvestmentEarningVisitor for: account) value.].
+	parallelClosures add: [lines := (AccountSummary for: account) lines].
 	
-	parallelClosures add: [investmentNetValue := (InvestmentNetVisitor for: account) value].
-	parallelClosures add: [lines := (AccountSummaryWithInvestmentEarnings for: account) lines].
+	finalClosure:=  [lines add: 'Ganancias por ', investmentEarningLines printString].
 	
-	finalClosure:=  [lines add: 'Inversiones por ', investmentNetValue printString].
+	executer := ParallelExecuter forParallelClosures: parallelClosures andNonParallelFinalClosure: finalClosure.
 	
-	executer executeFirstTheseClosuresInParallel: parallelClosures thenExecute:finalClosure.
+	executer execute.
 	
 	^ lines.! !
 
@@ -1326,25 +1303,38 @@ for: aReceptiveAccount
 
 !classDefinition: #ParallelExecuter category: #'PortfolioTimeConsuming-Ejercicio'!
 Object subclass: #ParallelExecuter
-	instanceVariableNames: ''
+	instanceVariableNames: 'semaphore parallelClosures finalClosure'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTimeConsuming-Ejercicio'!
 
-!ParallelExecuter methodsFor: 'as yet unclassified' stamp: 'pf 5/21/2018 15:21:34'!
-executeFirstTheseClosuresInParallel: closuresToExecute thenExecute: finalClosure
-
-	|semaphore closuresCount|
-
-	semaphore := Semaphore new.
+!ParallelExecuter methodsFor: 'as yet unclassified' stamp: 'PF 5/22/2018 14:00:44'!
+execute
 	
- 	closuresToExecute do: [:aClosure | [aClosure value. semaphore signal.] fork. ].
-	
-	closuresCount := closuresToExecute size.
-	
-	closuresCount timesRepeat: [semaphore wait].
+ 	parallelClosures do: [:aClosure | [aClosure value. semaphore signal.] fork. ].
+		
+	(parallelClosures size) timesRepeat: [semaphore wait].
 	
 	finalClosure value.! !
+
+!ParallelExecuter methodsFor: 'as yet unclassified' stamp: 'PF 5/22/2018 13:59:06'!
+initializeWith: closuresCollection and: aClosure
+
+	semaphore := Semaphore new.
+	parallelClosures:= closuresCollection.
+	finalClosure := aClosure.
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ParallelExecuter class' category: #'PortfolioTimeConsuming-Ejercicio'!
+ParallelExecuter class
+	instanceVariableNames: ''!
+
+!ParallelExecuter class methodsFor: 'as yet unclassified' stamp: 'PF 5/22/2018 14:07:35'!
+forParallelClosures: collectionOfClosures andNonParallelFinalClosure: finalClosure
+
+	^self new initializeWith: collectionOfClosures and: finalClosure.! !
 
 
 !classDefinition: #ReversePortfolioTreePrinter category: #'PortfolioTimeConsuming-Ejercicio'!
