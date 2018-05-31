@@ -544,7 +544,6 @@ isTied
 	^self subclassResponsibility.! !
 
 
-
 !GameState methodsFor: 'mark and give next state' stamp: 'pf 5/31/2018 14:16:10'!
 markWithO: aPosition andGiveNextStatefor: aGame
 
