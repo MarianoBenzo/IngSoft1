@@ -949,26 +949,19 @@ isTied
  		! !
 
 
-!TicTaeToe methodsFor: 'private' stamp: 'MB 5/30/2018 23:42:00'!
+!TicTaeToe methodsFor: 'board positions' stamp: 'MB 5/30/2018 23:42:00'!
 boardComplete
 
 	^ board allSatisfy: [ :position | position markedWithO or: position markedWithX ].
  		! !
 
-!TicTaeToe methodsFor: 'private' stamp: 'pf 5/31/2018 15:48:11'!
-boardPositionFor: aPoint
-	[ ^ (board select: [ :position |
-		position x = aPoint x and: position y = aPoint y ]) first ]
-		on: Error
-		do: [ self error: TicTaeToe invalidPositionErrorMessage ].! !
-
-!TicTaeToe methodsFor: 'private' stamp: 'pf 5/31/2018 14:19:04'!
+!TicTaeToe methodsFor: 'board positions' stamp: 'pf 5/31/2018 14:19:04'!
 positionsMarkedWithO
 
 	^(board select: [ :position | position markedWithO ]) copy.
  		! !
 
-!TicTaeToe methodsFor: 'private' stamp: 'pf 5/31/2018 14:18:56'!
+!TicTaeToe methodsFor: 'board positions' stamp: 'pf 5/31/2018 14:18:56'!
 positionsMarkedWithX
 
 	^(board select: [ :position | position markedWithX ]) copy.
@@ -1005,6 +998,14 @@ playCountForO
 playCountForX
 
 	^ (board select: [ :position | position markedWithX ]) size.! !
+
+
+!TicTaeToe methodsFor: 'private' stamp: 'pf 5/31/2018 15:48:11'!
+boardPositionFor: aPoint
+	[ ^ (board select: [ :position |
+		position x = aPoint x and: position y = aPoint y ]) first ]
+		on: Error
+		do: [ self error: TicTaeToe invalidPositionErrorMessage ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
