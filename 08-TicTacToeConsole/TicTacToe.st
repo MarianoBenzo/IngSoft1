@@ -5,8 +5,8 @@ TestCase subclass: #TicTacToeConsoleTest
 	poolDictionaries: ''
 	category: 'TicTacToe'!
 
-!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 5/31/2018 19:03:12'!
-test01
+!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:23:35'!
+test01CheckConsoleInitializesInEmptyState
 	
 	game := TicTacToe new.
 	
@@ -18,8 +18,8 @@ test01
 	
 	! !
 
-!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 5/31/2018 20:03:01'!
-test02
+!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:27:15'!
+test02CheckConsoleAfterMarkingX
 	
 	game := TicTacToe new.
 	
@@ -34,6 +34,198 @@ test02
 	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
 	
 	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
+	
+	
+	! !
+
+!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:46:30'!
+test03CheckConsoleAfterMarkingXO
+	
+	game := TicTacToe new.
+	
+	console := TicTacToeConsole new.
+	
+	game registerObserver: console.
+	
+	game markWithXAt: 2@2.
+	game markWithOAt: 1@1.
+	
+	self assert: console getLog size = 4.
+	
+	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
+	
+	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
+	
+	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
+	
+	
+	! !
+
+!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:46:07'!
+test04CheckConsoleAfterMarkingXOX
+	
+	game := TicTacToe new.
+	
+	console := TicTacToeConsole new.
+	
+	game registerObserver: console.
+	
+	game markWithXAt: 2@2.
+	game markWithOAt: 1@1.
+	game markWithXAt: 1@3.
+	
+	self assert: console getLog size = 6.
+	
+	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
+	
+	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
+	
+	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 5) = 'X marcó en 1@3'.
+	
+	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
+	
+	
+	! !
+
+!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:49:31'!
+test04CheckConsoleAfterWinningX
+	
+	game := TicTacToe new.
+	
+	console := TicTacToeConsole new.
+	
+	game registerObserver: console.
+	
+	game markWithXAt: 2@2.
+	game markWithOAt: 1@1.
+	game markWithXAt: 1@3.
+	game markWithOAt: 1@2.
+	game markWithXAt: 3@1.
+	
+	self assert: console getLog size = 10.
+	
+	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
+	
+	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
+	
+	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 5) = 'X marcó en 1@3'.
+	
+	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 7) = 'O marcó en 1@2'.
+	
+	self assert: (console getLog at: 8) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 9) = 'X marcó en 3@1'.
+	
+	self assert: (console getLog at: 10) = 'Estado: Ganó X'.
+	
+	
+	! !
+
+!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 15:07:15'!
+test05CheckConsoleAfterWinningO
+	
+	game := TicTacToe new.
+	
+	console := TicTacToeConsole new.
+	
+	game registerObserver: console.
+	
+	game markWithXAt: 3@3.	
+	game markWithOAt: 2@2.
+	game markWithXAt: 1@1.
+	game markWithOAt: 1@3.
+	game markWithXAt: 1@2.
+	game markWithOAt: 3@1.
+	
+	self assert: console getLog size = 12.
+	
+	self assert: (console getLog at: 1) = 'X marcó en 3@3'.
+	
+	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 3) = 'O marcó en 2@2'.
+	
+	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 5) = 'X marcó en 1@1'.
+	
+	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 7) = 'O marcó en 1@3'.
+	
+	self assert: (console getLog at: 8) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 9) = 'X marcó en 1@2'.
+	
+	self assert: (console getLog at: 10) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 11) = 'O marcó en 3@1'.
+	
+	self assert: (console getLog at: 12) = 'Estado: Ganó O'.
+	
+	
+	! !
+
+!TicTacToeConsoleTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 15:17:54'!
+test05CheckConsoleWhenGameIsTied
+	
+	game := TicTacToe new.
+	
+	console := TicTacToeConsole new.
+	
+	game registerObserver: console.
+	
+	game markAll: { 2@2. 1@1. 1@3. 3@1. 2@1. 2@3. 1@2. 3@2. 3@3 }.
+	
+	self assert: console getLog size = 18.
+	
+	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
+	
+	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
+	
+	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 5) = 'X marcó en 1@3'.
+	
+	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 7) = 'O marcó en 3@1'.
+	
+	self assert: (console getLog at: 8) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 9) = 'X marcó en 2@1'.
+	
+	self assert: (console getLog at: 10) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 11) = 'O marcó en 2@3'.
+	
+	self assert: (console getLog at: 12) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 13) = 'X marcó en 1@2'.
+	
+	self assert: (console getLog at: 14) = 'Estado: Jugando O'.
+	
+	self assert: (console getLog at: 15) = 'O marcó en 3@2'.
+	
+	self assert: (console getLog at: 16) = 'Estado: Jugando X'.
+	
+	self assert: (console getLog at: 17) = 'X marcó en 3@3'.
+	
+	self assert: (console getLog at: 18) = 'Estado: Juego empatado'.
 	
 	
 	! !
@@ -475,12 +667,16 @@ markAt: aPosition
 
 	^state markAt: aPosition ! !
 
-!TicTacToe methodsFor: 'marking board' stamp: 'HAW 10/27/2017 10:30:17'!
+!TicTacToe methodsFor: 'marking board' stamp: 'PF 6/2/2018 14:30:38'!
 markWithOAt: aPosition
 
 	self assertIsInBoardBounds: aPosition.
 	
-	state markWithOAt: aPosition.! !
+	state markWithOAt: aPosition.
+	
+	observers do: [:observer | observer updateForOAt: aPosition].
+	
+	state updateObservers.! !
 
 !TicTacToe methodsFor: 'marking board' stamp: 'PF 5/31/2018 19:58:26'!
 markWithXAt: aPosition
@@ -646,9 +842,29 @@ shouldBeTiedWhenNoOneWon
 registerObserver: anObserver
 	observers add: anObserver.! !
 
+!TicTacToe methodsFor: 'observers' stamp: 'PF 6/2/2018 14:56:49'!
+updateObserversWithGameIsTied
+	observers do: [ :observer | observer updateWithGameIsTied]! !
+
+!TicTacToe methodsFor: 'observers' stamp: 'PF 6/2/2018 14:57:29'!
+updateObserversWithGameOver
+	observers do: [ :observer | observer updateWithGameOver]! !
+
+!TicTacToe methodsFor: 'observers' stamp: 'PF 6/2/2018 14:55:56'!
+updateObserversWithOWon
+	observers do: [ :observer | observer updateWithOWon]! !
+
 !TicTacToe methodsFor: 'observers' stamp: 'PF 5/31/2018 20:01:56'!
 updateObserversWithPlayingO
-	observers do: [ :observer | observer updateWithPlayingO.! !
+	observers do: [ :observer | observer updateWithPlayingO.]! !
+
+!TicTacToe methodsFor: 'observers' stamp: 'PF 6/2/2018 14:40:37'!
+updateObserversWithPlayingX
+	observers do: [ :observer | observer updateWithPlayingX.]! !
+
+!TicTacToe methodsFor: 'observers' stamp: 'PF 6/2/2018 14:56:06'!
+updateObserversWithXWon
+	observers do: [ :observer | observer updateWithXWon]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -689,25 +905,64 @@ Object subclass: #TicTacToeConsole
 	poolDictionaries: ''
 	category: 'TicTacToe'!
 
-!TicTacToeConsole methodsFor: 'as yet unclassified' stamp: 'PF 5/31/2018 19:00:38'!
-getLog
+!TicTacToeConsole methodsFor: 'update log' stamp: 'PF 6/2/2018 14:35:23'!
+updateForOAt: aPosition
 
-	^ log copy.! !
+	self updateFor: 'O' At: aPosition 
+! !
 
-!TicTacToeConsole methodsFor: 'as yet unclassified' stamp: 'PF 5/31/2018 19:21:34'!
+!TicTacToeConsole methodsFor: 'update log' stamp: 'PF 6/2/2018 14:34:48'!
 updateForXAt: aPosition
 
-	log add: ('X marcó en ', (2@2) printString).! !
+	self updateFor: 'X' At: aPosition 
+! !
 
-!TicTacToeConsole methodsFor: 'as yet unclassified' stamp: 'PF 5/31/2018 20:02:18'!
+!TicTacToeConsole methodsFor: 'update log' stamp: 'PF 6/2/2018 15:16:35'!
+updateWithGameIsTied
+
+	log add: ('Estado: Juego empatado')! !
+
+!TicTacToeConsole methodsFor: 'update log' stamp: 'PF 6/2/2018 15:01:47'!
+updateWithOWon
+
+	log add: ('Estado: Ganó O')! !
+
+!TicTacToeConsole methodsFor: 'update log' stamp: 'PF 6/2/2018 14:37:17'!
 updateWithPlayingO
 
-	log add: ('Estado: Jugando O')! !
+	self updateWithPlaying: 'O'! !
+
+!TicTacToeConsole methodsFor: 'update log' stamp: 'PF 6/2/2018 14:37:52'!
+updateWithPlayingX
+
+	self updateWithPlaying: 'X'! !
+
+!TicTacToeConsole methodsFor: 'update log' stamp: 'PF 6/2/2018 15:01:40'!
+updateWithXWon
+
+	log add: ('Estado: Ganó X')! !
 
 
 !TicTacToeConsole methodsFor: 'initialization' stamp: 'PF 5/31/2018 19:01:16'!
 initialize
 	log := OrderedCollection new.! !
+
+
+!TicTacToeConsole methodsFor: 'private' stamp: 'PF 6/2/2018 14:43:58'!
+updateFor:aTicTacToeSymbol At: aPosition
+
+	log add: (aTicTacToeSymbol, ' marcó en ', aPosition printString).! !
+
+!TicTacToeConsole methodsFor: 'private' stamp: 'PF 6/2/2018 14:36:46'!
+updateWithPlaying: aTicTacToeSymbol
+
+	log add: ('Estado: Jugando ', aTicTacToeSymbol)! !
+
+
+!TicTacToeConsole methodsFor: 'get log' stamp: 'PF 5/31/2018 19:00:38'!
+getLog
+
+	^ log copy.! !
 
 
 !classDefinition: #TicTacToeState category: #TicTacToe!
@@ -734,11 +989,6 @@ isOver
 
 !TicTacToeState methodsFor: 'testing game result' stamp: 'HAW 10/26/2017 12:28:07'!
 isTied
-	
-	self subclassResponsibility! !
-
-!TicTacToeState methodsFor: 'testing game result' stamp: 'PF 5/31/2018 19:59:50'!
-updateObservers
 	
 	self subclassResponsibility! !
 
@@ -772,6 +1022,12 @@ markWithXAt: aPosition
 initializeFor: aGame
 
 	game := aGame ! !
+
+
+!TicTacToeState methodsFor: 'update observers' stamp: 'PF 6/2/2018 14:54:57'!
+updateObservers
+	
+	self subclassResponsibility! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -822,6 +1078,14 @@ markWithOAt: aPosition
 markWithXAt: aPosition
 	game error: game class canNotPlayWhenGameIsOverErrorMessage.! !
 
+
+!GameOverState methodsFor: 'update observers' stamp: 'PF 6/2/2018 15:27:25'!
+updateObservers
+	
+	"la clase GameOverState no es referenciada desde ningun lugar asi que por el momento este metodo nunca se va a ejecutar"
+	
+	game updateObserversWithGameOver! !
+
 
 !classDefinition: #GameTied category: #TicTacToe!
 GameOverState subclass: #GameTied
@@ -842,6 +1106,12 @@ hasPlayerXWon
 isTied
 	
 	^true! !
+
+
+!GameTied methodsFor: 'update observers' stamp: 'PF 6/2/2018 14:53:21'!
+updateObservers
+	
+	game updateObserversWithGameIsTied! !
 
 
 !classDefinition: #PlayerOWon category: #TicTacToe!
@@ -864,6 +1134,12 @@ isTied
 	
 	^false! !
 
+
+!PlayerOWon methodsFor: 'update observers' stamp: 'PF 6/2/2018 14:51:56'!
+updateObservers
+	
+	game updateObserversWithOWon! !
+
 
 !classDefinition: #PlayerXWon category: #TicTacToe!
 GameOverState subclass: #PlayerXWon
@@ -884,6 +1160,12 @@ hasPlayerXWon
 isTied
 	
 	^false! !
+
+
+!PlayerXWon methodsFor: 'update observers' stamp: 'PF 6/2/2018 14:50:56'!
+updateObservers
+	
+	game updateObserversWithXWon! !
 
 
 !classDefinition: #PlayingState category: #TicTacToe!
@@ -929,11 +1211,6 @@ isPlayingX
 	
 	^false! !
 
-!PlayingO methodsFor: 'testing playing turn' stamp: 'PF 5/31/2018 20:00:53'!
-updateObservers
-	
-	game updateObserversWithPlayingO! !
-
 
 !PlayingO methodsFor: 'marking board' stamp: 'HAW 5/31/2018 18:49:13'!
 markAt: aPosition
@@ -947,6 +1224,12 @@ markWithOAt: aPosition
 !PlayingO methodsFor: 'marking board' stamp: 'HAW 10/26/2017 12:30:32'!
 markWithXAt: aPosition
 	game markWithXWhenPlayingOAt: aPosition.! !
+
+
+!PlayingO methodsFor: 'update observers' stamp: 'PF 5/31/2018 20:00:53'!
+updateObservers
+	
+	game updateObserversWithPlayingO! !
 
 
 !classDefinition: #PlayingX category: #TicTacToe!
@@ -979,3 +1262,9 @@ markWithOAt: aPosition
 !PlayingX methodsFor: 'marking board' stamp: 'HAW 10/26/2017 12:30:46'!
 markWithXAt: aPosition
 	game markWithXWhenPlayingXAt: aPosition.! !
+
+
+!PlayingX methodsFor: 'update observers' stamp: 'PF 6/2/2018 14:39:08'!
+updateObservers
+	
+	game updateObserversWithPlayingX! !
