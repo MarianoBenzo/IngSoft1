@@ -1,11 +1,97 @@
 !classDefinition: #TicTacToeObserversTest category: #TicTacToe!
 TestCase subclass: #TicTacToeObserversTest
-	instanceVariableNames: 'game console view'
+	instanceVariableNames: 'game console view positions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TicTacToe'!
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:23:35'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:17:49'!
+assert: aTicTacToeLog correspondsTo: takenPositions withFinalState: finalState
+		
+	|logMinusLast positionsMinusLast|	
+		
+	positionsMinusLast := takenPositions allButLast.
+	
+	logMinusLast := aTicTacToeLog allButLast.
+		
+	self assert: aTicTacToeLog size = (takenPositions size * 2).
+	
+	self checkPositionsMarkedWithXFor: positionsMinusLast and: logMinusLast.
+	self checkPositionsMarkedWithOFor: positionsMinusLast and: logMinusLast.
+	self checkPlayingOFor: logMinusLast.
+	self checkPlayingXFor: logMinusLast.
+	
+	self assert: aTicTacToeLog last = finalState.! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:33:33'!
+checkPlayingOFor: aTicTacLog
+
+"de aTicTacLog ncesito indices 2, 6 10,14..."
+
+	|playngOLogLines|
+
+	playngOLogLines := self takeElementsWhithIndex: 2 Mod: 4 from: aTicTacLog.
+
+
+  	(1 to: playngOLogLines size) do: [:index | self assert: ((self class playingO ) = (playngOLogLines at: index))].		
+
+	! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:33:57'!
+checkPlayingXFor: aTicTacLog
+
+"de aTicTacLog ncesito indices 4, 8 12,16..."
+
+
+	|playngXLogLines|
+
+	playngXLogLines := self takeElementsWhithIndex: 0 Mod: 4 from: aTicTacLog.
+
+
+  	(1 to: playngXLogLines size) do: [:index | self assert: ((self class playingX) = (playngXLogLines at: index))].	! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 14:53:50'!
+checkPositionsMarkedWithOFor: ticTacToePositions and: aTicTacLog
+
+"de ticTacToePositions quiero indices 2,4,6,8..."
+"de aTicTacLog ncesito indices 3, 7, 11,15..."
+
+	|ticTacToePositionsForO playngOLogLines|
+	
+	playngOLogLines := self takeElementsWhithIndex: 3 Mod: 4 from: aTicTacLog.
+	ticTacToePositionsForO := self takeElementsWhithIndex: 0 Mod: 2 from: ticTacToePositions.
+
+  	(1 to: ticTacToePositionsForO size) do: [:index | self assert: ('O marcó en ', (ticTacToePositionsForO at: index) printString) = (playngOLogLines at: index)]	
+	! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 14:50:49'!
+checkPositionsMarkedWithXFor: ticTacToePositions and: aTicTacLog
+
+"de ticTacToePositions quiero indices 1,3,5,7..."
+"de aTicTacLog ncesito indices 1, 5, 9,13..."
+
+	|ticTacToePositionsForX playngXLogLines|
+	
+	playngXLogLines := self takeElementsWhithIndex: 1 Mod: 4 from: aTicTacLog.
+	ticTacToePositionsForX := self takeElementsWhithIndex: 1 Mod: 2 from: ticTacToePositions.
+
+  	(1 to: ticTacToePositionsForX size) do: [:index | self assert: ('X marcó en ', (ticTacToePositionsForX at: index) printString) = (playngXLogLines at: index)]	
+	! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 14:41:14'!
+takeElementsWhithIndex: anInteger Mod: anotherInteger from: anOrderedCollection
+		
+	|result|
+	
+	"TODO sacar este metodo de aca y agregarlo como metodo de la clase OrderedCollection, quitando el segudno parametro"
+	
+	result := OrderedCollection  new.
+	
+	(1 to: anOrderedCollection size ) do: [: index | (index \\ anotherInteger ) = anInteger ifTrue: [result add: (anOrderedCollection at: index)]].
+	
+	^result.! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'PF 6/2/2018 14:23:35'!
 test01CheckConsoleInitializesInEmptyState
 	
 	game := TicTacToe new.
@@ -18,53 +104,25 @@ test01CheckConsoleInitializesInEmptyState
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:27:15'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:27:50'!
 test02CheckConsoleAfterMarkingX
 	
+	positions := { 2@2.}.
+	
 	game := TicTacToe new.
 	
 	console := TicTacToeConsole new.
 	
 	game registerObserver: console.
 	
-	game markWithXAt: 2@2.
+	game markAll: positions.
 	
-	self assert: console getLog size = 2.
-	
-	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
-	
-	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
-	
-	
-	! !
+	self assert: console getLog correspondsTo: positions withFinalState: self class playingO ! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:46:30'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:28:10'!
 test03CheckConsoleAfterMarkingXO
 	
-	game := TicTacToe new.
-	
-	console := TicTacToeConsole new.
-	
-	game registerObserver: console.
-	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	
-	self assert: console getLog size = 4.
-	
-	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
-	
-	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
-	
-	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
-	
-	
-	! !
-
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:46:07'!
-test04CheckConsoleAfterMarkingXOX
+	positions:= { 2@2. 1@1. }.
 	
 	game := TicTacToe new.
 	
@@ -72,114 +130,33 @@ test04CheckConsoleAfterMarkingXOX
 	
 	game registerObserver: console.
 	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@3.
+	game markAll: positions.
 	
-	self assert: console getLog size = 6.
-	
-	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
-	
-	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
-	
-	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 5) = 'X marcó en 1@3'.
-	
-	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
-	
+	self assert: console getLog correspondsTo: positions withFinalState: self class playingX 
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 14:49:31'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:29:17'!
 test04CheckConsoleAfterWinningX
 	
+	positions:= { 2@2. 1@1. 1@3. 1@2. 3@1. }.
+	
 	game := TicTacToe new.
 	
 	console := TicTacToeConsole new.
 	
 	game registerObserver: console.
 	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@3.
-	game markWithOAt: 1@2.
-	game markWithXAt: 3@1.
+	game markAll: positions.
 	
-	self assert: console getLog size = 10.
-	
-	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
-	
-	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
-	
-	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 5) = 'X marcó en 1@3'.
-	
-	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 7) = 'O marcó en 1@2'.
-	
-	self assert: (console getLog at: 8) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 9) = 'X marcó en 3@1'.
-	
-	self assert: (console getLog at: 10) = 'Estado: Ganó X'.
-	
+	self assert: console getLog correspondsTo: positions withFinalState: self class wonX
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 15:07:15'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:29:38'!
 test05CheckConsoleAfterWinningO
 	
-	game := TicTacToe new.
-	
-	console := TicTacToeConsole new.
-	
-	game registerObserver: console.
-	
-	game markWithXAt: 3@3.	
-	game markWithOAt: 2@2.
-	game markWithXAt: 1@1.
-	game markWithOAt: 1@3.
-	game markWithXAt: 1@2.
-	game markWithOAt: 3@1.
-	
-	self assert: console getLog size = 12.
-	
-	self assert: (console getLog at: 1) = 'X marcó en 3@3'.
-	
-	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 3) = 'O marcó en 2@2'.
-	
-	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 5) = 'X marcó en 1@1'.
-	
-	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 7) = 'O marcó en 1@3'.
-	
-	self assert: (console getLog at: 8) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 9) = 'X marcó en 1@2'.
-	
-	self assert: (console getLog at: 10) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 11) = 'O marcó en 3@1'.
-	
-	self assert: (console getLog at: 12) = 'Estado: Ganó O'.
-	
-	
-	! !
-
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'PF 6/2/2018 15:17:54'!
-test05CheckConsoleWhenGameIsTied
+	positions := { 3@3. 2@2. 1@1. 1@3. 1@2. 3@1. }.
 	
 	game := TicTacToe new.
 	
@@ -187,50 +164,46 @@ test05CheckConsoleWhenGameIsTied
 	
 	game registerObserver: console.
 	
-	game markAll: { 2@2. 1@1. 1@3. 3@1. 2@1. 2@3. 1@2. 3@2. 3@3 }.
+	game markAll: positions.
 	
-	self assert: console getLog size = 18.
+	self assert: console getLog correspondsTo: positions withFinalState: self class wonO.
+	! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:30:15'!
+test06CheckConsoleAfterMarkingXOX
+
+	positions := { 2@2. 1@1. 1@3. }.
 	
-	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
+	game := TicTacToe new.
 	
-	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
+	console := TicTacToeConsole new.
 	
-	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
+	game registerObserver: console.
 	
-	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
+	game markAll: { 2@2. 1@1. 1@3. }.
 	
-	self assert: (console getLog at: 5) = 'X marcó en 1@3'.
-	
-	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 7) = 'O marcó en 3@1'.
-	
-	self assert: (console getLog at: 8) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 9) = 'X marcó en 2@1'.
-	
-	self assert: (console getLog at: 10) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 11) = 'O marcó en 2@3'.
-	
-	self assert: (console getLog at: 12) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 13) = 'X marcó en 1@2'.
-	
-	self assert: (console getLog at: 14) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 15) = 'O marcó en 3@2'.
-	
-	self assert: (console getLog at: 16) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 17) = 'X marcó en 3@3'.
-	
-	self assert: (console getLog at: 18) = 'Estado: Juego empatado'.
-	
+	self assert: console getLog correspondsTo: positions withFinalState: self class playingO
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 19:22:38'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:31:51'!
+test07CheckConsoleWhenGameIsTied
+
+	|positions|
+	
+	positions := { 2@2. 1@1. 1@3. 3@1. 2@1. 2@3. 1@2. 3@2. 3@3 }.
+	
+	game := TicTacToe new.
+	
+	console := TicTacToeConsole new.
+	
+	game registerObserver: console.
+	
+	game markAll: positions.
+	
+	self assert: console getLog correspondsTo: positions withFinalState: self class tiedGame .! !
+
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'MB 6/3/2018 19:22:38'!
 test08CheckViewInitializesInEmptyBoard
 	
 	| emptyView |
@@ -253,7 +226,7 @@ Playing X'.
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 19:24:27'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'MB 6/3/2018 19:24:27'!
 test09CheckViewAfterMarkingX
 
 	| mockView |
@@ -279,7 +252,7 @@ Playing O'.
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 19:27:09'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'MB 6/3/2018 19:27:09'!
 test10CheckViewAfterMarkingXO
 	
 	| mockView |
@@ -306,7 +279,7 @@ Playing X'.
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 19:37:34'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'PF 6/4/2018 11:34:33'!
 test11CheckViewAfterMarkingXOX
 	
 	| mockView |
@@ -325,16 +298,14 @@ Playing O'.
 	
 	game registerObserver: view.
 	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@3.
+	game markAll: { 2@2. 1@1. 1@3.}.
 	
 	self assert: view getView = mockView.
 	
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 19:39:17'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'PF 6/4/2018 11:36:00'!
 test12CheckViewAfterWinningX
 	
 	| mockView |
@@ -353,18 +324,14 @@ X Won!!'.
 	
 	game registerObserver: view.
 	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@3.
-	game markWithOAt: 1@2.
-	game markWithXAt: 3@1.
+	game markAll: { 2@2. 1@1. 1@3. 1@2. 3@1. }.
 	
 	self assert: view getView = mockView.
 	
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 19:42:45'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'PF 6/4/2018 11:37:00'!
 test13CheckViewAfterWinningO
 	
 	| mockView |
@@ -383,19 +350,14 @@ O Won!!'.
 	
 	game registerObserver: view.
 	
-	game markWithXAt: 3@3.	
-	game markWithOAt: 2@2.
-	game markWithXAt: 1@1.
-	game markWithOAt: 1@3.
-	game markWithXAt: 1@2.
-	game markWithOAt: 3@1.
+	game markAll: { 3@3. 2@2. 1@1. 1@3. 1@2. 3@1. }.
 	
 	self assert: view getView = mockView.
 	
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 19:47:51'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'MB 6/3/2018 19:47:51'!
 test14CheckViewWhenGameIsTied
 	
 	| mockView |
@@ -421,7 +383,7 @@ Game is tied'.
 	
 	! !
 
-!TicTacToeObserversTest methodsFor: 'as yet unclassified' stamp: 'MB 6/3/2018 20:05:48'!
+!TicTacToeObserversTest methodsFor: 'testing' stamp: 'pf 6/4/2018 15:32:50'!
 test15CheckConsoleAndViewAfterWinningX
 	
 		| mockView |
@@ -434,6 +396,8 @@ O|O|X
 X| | 
 X Won!!'.
 	
+	positions := { 2@2. 1@1. 1@3. 1@2. 3@1.}.
+	
 	game := TicTacToe new.
 	
 	view := TicTacToeView new.
@@ -444,38 +408,42 @@ X Won!!'.
 	
 	game registerObserver: console.
 	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@3.
-	game markWithOAt: 1@2.
-	game markWithXAt: 3@1.
+	game markAll: positions.
 	
-	self assert: console getLog size = 10.
-	
-	self assert: (console getLog at: 1) = 'X marcó en 2@2'.
-	
-	self assert: (console getLog at: 2) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 3) = 'O marcó en 1@1'.
-	
-	self assert: (console getLog at: 4) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 5) = 'X marcó en 1@3'.
-	
-	self assert: (console getLog at: 6) = 'Estado: Jugando O'.
-	
-	self assert: (console getLog at: 7) = 'O marcó en 1@2'.
-	
-	self assert: (console getLog at: 8) = 'Estado: Jugando X'.
-	
-	self assert: (console getLog at: 9) = 'X marcó en 3@1'.
-	
-	self assert: (console getLog at: 10) = 'Estado: Ganó X'.
-	
-	self assert: view getView = mockView.
-	
-	
-	! !
+	self assert: console getLog correspondsTo: positions withFinalState: self class wonX.	
+	 
+	self assert: view getView = mockView.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TicTacToeObserversTest class' category: #TicTacToe!
+TicTacToeObserversTest class
+	instanceVariableNames: ''!
+
+!TicTacToeObserversTest class methodsFor: 'as yet unclassified' stamp: 'pf 6/4/2018 15:26:10'!
+playingO
+
+	^'Estado: Jugando O'! !
+
+!TicTacToeObserversTest class methodsFor: 'as yet unclassified' stamp: 'pf 6/4/2018 15:26:17'!
+playingX
+
+	^'Estado: Jugando X'! !
+
+!TicTacToeObserversTest class methodsFor: 'as yet unclassified' stamp: 'pf 6/4/2018 15:31:22'!
+tiedGame
+
+	^'Estado: Juego empatado'.! !
+
+!TicTacToeObserversTest class methodsFor: 'as yet unclassified' stamp: 'pf 6/4/2018 15:26:43'!
+wonO
+
+	^'Estado: Ganó O'! !
+
+!TicTacToeObserversTest class methodsFor: 'as yet unclassified' stamp: 'pf 6/4/2018 15:26:36'!
+wonX
+
+	^'Estado: Ganó X'! !
 
 
 !classDefinition: #TicTacToeTest category: #TicTacToe!
