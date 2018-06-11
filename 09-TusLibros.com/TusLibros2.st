@@ -242,10 +242,10 @@ Object subclass: #Cart
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'MB 6/7/2018 19:13:45'!
-initializeWith: aPriceCatalog
+!Cart methodsFor: 'as yet unclassified' stamp: 'MB 6/7/2018 19:17:57'!
+itemsDo: aClosure
 
-	priceCatalog := aPriceCatalog.! !
+	items do: aClosure.! !
 
 
 !Cart methodsFor: 'error messages' stamp: 'HernanWilkinson 6/17/2013 17:45'!
@@ -269,16 +269,6 @@ assertIsValidQuantity: aQuantity
 
 	(aQuantity strictlyPositive and: aQuantity isInteger) ifFalse: [ self error: self invalidQuantityErrorMessage ]! !
 
-!Cart methodsFor: 'assertions' stamp: 'MB 6/7/2018 19:17:57'!
-itemsDo: aClosure
-
-	items do: aClosure.! !
-
-!Cart methodsFor: 'assertions' stamp: 'MB 6/7/2018 19:17:17'!
-priceFor: anItem
-
-	^ priceCatalog at: anItem. ! !
-
 
 !Cart methodsFor: 'initialization' stamp: 'MB 6/7/2018 19:13:26'!
 initializeAcceptingItemsOf: aPriceCatalog
@@ -291,6 +281,13 @@ initializeAcceptingItemsOf: aPriceCatalog
 occurrencesOf: anItem
 
 	^items occurrencesOf: anItem  ! !
+
+!Cart methodsFor: 'queries' stamp: 'pf 6/11/2018 15:58:47'!
+priceFor: anItem
+
+	"TODO: ver si seria mejor que este mensaje lo sepa responder el cashier en vez del cart. en este momento no lo podemos pasar al cashier porque el cashier no conoce la lista de precios. probablemente debiera conocerla"
+
+	^ priceCatalog at: anItem. ! !
 
 
 !Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
@@ -347,20 +344,7 @@ Object subclass: #Cashier
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'MB 6/7/2018 19:23:17'!
-checkOut: aCart
-
-	|result|
-	
-	result := peso * 0.
-	
-	aCart isEmpty ifTrue: [ self error: Cashier invalidCartErrorMessage. ].
-	
-	aCart itemsDo: [:item | result := result + (aCart priceFor: item) ].
-	
-	^result.! !
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'MB 6/7/2018 20:26:28'!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'pf 6/11/2018 16:02:12'!
 checkOut: aCart withCreditCard: aCard atDate: aDate
 
 	|result|
@@ -375,7 +359,14 @@ checkOut: aCart withCreditCard: aCard atDate: aDate
 		
 	aCart itemsDo: [:item | result := result + (aCart priceFor: item) ].
 	
+	self debit: result from: aCard.
+	
 	^result.! !
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'pf 6/11/2018 15:56:50'!
+debit: anAmount from: creditCard
+
+	"todo: llamar al merchant processor"! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
