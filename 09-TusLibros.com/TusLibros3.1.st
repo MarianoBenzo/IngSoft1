@@ -173,6 +173,34 @@ test03CanNotCheckoutWithAnExpiredCreditCart
 			self assert: anError messageText = Cashier canNotChargeAnExpiredCreditCardErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:23:11'!
+test03CanNotCheckoutWithAnExpiredCreditCartSecondVersion
+
+	| cart salesBook merchantProcessorWasCalled |
+	
+	merchantProcessorWasCalled := false.
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore.
+	salesBook := OrderedCollection new.
+	
+	
+	
+	testObjectsFactory setDebitResponse: [merchantProcessorWasCalled := true].
+	
+	self
+		should: [ Cashier 
+				toCheckout: cart 
+				charging: testObjectsFactory expiredCreditCard 
+				on: testObjectsFactory today
+				registeringOn: salesBook
+				with: self ]
+			
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError | 
+			self assert: anError messageText = Cashier canNotChargeAnExpiredCreditCardErrorMessage.
+			self assert: salesBook isEmpty.
+			self deny: merchantProcessorWasCalled]! !
+
 !CashierTest methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 21:00:55'!
 test04CheckoutRegistersASale
 
