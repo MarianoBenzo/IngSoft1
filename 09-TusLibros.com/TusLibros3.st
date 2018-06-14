@@ -115,7 +115,7 @@ setUp
 
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 21:00:23'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:54:46'!
 test01CanNotCheckoutAnEmptyCart
 
 	| salesBook |
@@ -124,7 +124,7 @@ test01CanNotCheckoutAnEmptyCart
 	self 
 		should: [ Cashier 
 			toCheckout: testObjectsFactory createCart 
-			charging: testObjectsFactory notExpiredCreditCard 
+			charging: testObjectsFactory unexpiredCreditCard 
 			on: testObjectsFactory today
 			registeringOn:  salesBook
 			with: self ]
@@ -133,7 +133,7 @@ test01CanNotCheckoutAnEmptyCart
 			self assert: anError messageText = Cashier cartCanNotBeEmptyErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 21:00:32'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:54:49'!
 test02CalculatedTotalIsCorrect
 
 	| cart cashier |
@@ -142,21 +142,26 @@ test02CalculatedTotalIsCorrect
 	cart add: 2 of: testObjectsFactory itemSellByTheStore.
 	
 	cashier :=  Cashier toCheckout: cart 
-							charging: testObjectsFactory notExpiredCreditCard 
+							charging: testObjectsFactory unexpiredCreditCard 
 							on: testObjectsFactory today 
 							registeringOn: OrderedCollection new
 							with: self.
 							
 	self assert: cashier checkOut = (testObjectsFactory itemSellByTheStorePrice * 2)! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 21:00:44'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:44:13'!
 test03CanNotCheckoutWithAnExpiredCreditCart
 
-	| cart salesBook |
-
+	| cart salesBook merchantProcessorWasCalled |
+	
+	merchantProcessorWasCalled := false.
 	cart := testObjectsFactory createCart.
 	cart add: testObjectsFactory itemSellByTheStore.
 	salesBook := OrderedCollection new.
+	
+	
+	
+	testObjectsFactory setDebitResponse: [merchantProcessorWasCalled := true].
 	
 	self
 		should: [ Cashier 
@@ -169,9 +174,10 @@ test03CanNotCheckoutWithAnExpiredCreditCart
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError | 
 			self assert: anError messageText = Cashier canNotChargeAnExpiredCreditCardErrorMessage.
-			self assert: salesBook isEmpty ]! !
+			self assert: salesBook isEmpty.
+			self deny: merchantProcessorWasCalled]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 21:00:55'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:54:57'!
 test04CheckoutRegistersASale
 
 	| cart cashier salesBook total |
@@ -182,7 +188,7 @@ test04CheckoutRegistersASale
  
 	cashier:= Cashier 
 		toCheckout: cart 
-		charging: testObjectsFactory notExpiredCreditCard
+		charging: testObjectsFactory unexpiredCreditCard 
 		on: testObjectsFactory today
 		registeringOn: salesBook
 		with: self.
@@ -192,7 +198,7 @@ test04CheckoutRegistersASale
 	self assert: salesBook notEmpty.
 	self assert: salesBook first total = total.! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 21:14:33'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:55:01'!
 test05CheckoutWithStolenCreditCardShouldRaiseException
 	| cart cashier salesBook |
 	cart _ testObjectsFactory createCart.
@@ -203,12 +209,10 @@ test05CheckoutWithStolenCreditCardShouldRaiseException
 	
 	cashier _ Cashier
 		toCheckout: cart
-		charging: testObjectsFactory notExpiredCreditCard 
+		charging: testObjectsFactory unexpiredCreditCard 
 		on: testObjectsFactory today
 		registeringOn: salesBook
 		with: self.
-	
-
 	
 	self
 		should: [ cashier checkOut. ]
@@ -217,7 +221,7 @@ test05CheckoutWithStolenCreditCardShouldRaiseException
 			self assert: anError messageText = Cashier canNotChargeAStolenCreditCardErrorMessage.
 			self assert: salesBook isEmpty ].! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 21:15:06'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:55:07'!
 test06CheckoutWithCreditCardWithoutCreditShouldRaiseException
 	| cart cashier salesBook |
 	cart _ testObjectsFactory createCart.
@@ -228,7 +232,7 @@ test06CheckoutWithCreditCardWithoutCreditShouldRaiseException
 	
 	cashier _ Cashier
 		toCheckout: cart
-		charging: testObjectsFactory notExpiredCreditCard 
+		charging: testObjectsFactory unexpiredCreditCard 
 		on: testObjectsFactory today
 		registeringOn: salesBook
 		with: self.
@@ -239,6 +243,16 @@ test06CheckoutWithCreditCardWithoutCreditShouldRaiseException
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier canNotChargeACreditCardWithoutCreditErrorMessage.
 			self assert: salesBook isEmpty ].! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CashierTest class' category: #TusLibros!
+CashierTest class
+	instanceVariableNames: ''!
+
+!CashierTest class methodsFor: 'as yet unclassified' stamp: 'MB 6/13/2018 21:56:34'!
+canNotDebitAnExpiredCreditCardErrorMessage
+	^'Can not debit an expired credit card'! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -525,18 +539,10 @@ expiredCreditCard
 		withNumber: '0002'
 		for: 'Owner expired card'! !
 
-!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 19:55:17'!
+!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'MB 6/13/2018 21:57:37'!
 initialize
 
-	today := DateAndTime now.
-	merchantProcessorInterfaceMock := MerchantProcessorInterfaceMock new.! !
-
-!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 20:41:13'!
-notExpiredCreditCard
-	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber + 1) 
-					withNumber: '0001' 
-					for: 'Owner not expired card'! !
+	today := DateAndTime now.! !
 
 !StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 20:37:39'!
 setDebitResponse: aClosure
@@ -547,6 +553,15 @@ setDebitResponse: aClosure
 today
 	
 	^ today! !
+
+!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'pf 6/13/2018 22:55:46'!
+unexpiredCreditCard
+
+	"lo unico que sabemos es que no expiro. no sabemos si es robada, si tiene saldo, etc, eso lo determinada el merchant processor"
+	
+	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber + 1) 
+					withNumber: '0001' 
+					for: 'Owner'! !
 
 
 !StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
