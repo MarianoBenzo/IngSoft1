@@ -288,91 +288,187 @@ setUp
 
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
-!ShopTest methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:28:47'!
-test01
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 14:02:12'!
+test01CartCanBeCreated
 	
-		| shop clientId clientPassword cartId |
+		| shop cartId |
 		
-		shop := Shop initializeWithCatalog: testObjectsFactory defaultCatalog andMerchantProcessor: self. 
+		shop := testObjectsFactory createShop.		
+	
+		cartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
 		
-		clientId := '001'.
-		clientPassword := '123'.
-		
-		cartId := shop createCartForClient: clientId password: clientPassword.
-		
-		self assert: shop carts size = 1.
+		self assert: shop cartsAmount = 1.
 		self assert: (shop listCart: cartId) isEmpty.
 		! !
 
-!ShopTest methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:40:48'!
-test02
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:52:03'!
+test02ProductsCanBeAddedToCart
 	
-		| shop clientId clientPassword cartId |
+		| shop cartId |
 		
-		shop := Shop initializeWithCatalog: testObjectsFactory defaultCatalog andMerchantProcessor: self. 
+		shop := testObjectsFactory createShop.
 		
-		clientId := '001'.
-		clientPassword := '123'.
-		
-		cartId := shop createCartForClient: clientId password: clientPassword.
+		cartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
 		
 		shop 	addToCart: cartId 
 				book: testObjectsFactory itemSellByTheStore 
-				quantity: 2.
+				quantity: 2
+				at: Time now.
 		
-		self assert: shop carts size = 1.
-		self assert: ((shop getCart: cartId ) occurrencesOf: testObjectsFactory itemSellByTheStore) = 2.
+		self assert: shop cartsAmount = 1.
+		self assert: (shop ocurrencesOf: testObjectsFactory itemSellByTheStore for: cartId) = 2.
 		! !
 
-!ShopTest methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 01:04:40'!
-test03
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:54:12'!
+test03CartCanBeListed
 	
-		| shop clientId clientPassword cartId list |
+		| shop cartId list |
 		
-		shop := Shop initializeWithCatalog: testObjectsFactory defaultCatalog andMerchantProcessor: self. 
+		shop := testObjectsFactory createShop.
 		
-		clientId := '001'.
-		clientPassword := '123'.
-		
-		cartId := shop createCartForClient: clientId password: clientPassword.
+		cartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
 		
 		shop 	addToCart: cartId 
 				book: testObjectsFactory itemSellByTheStore 
-				quantity: 2.
-		
+				quantity: 2
+				at: Time now.
+				
 		list := shop listCart: cartId.
 		
 		self assert: list notEmpty.
 		self assert: (list occurrencesOf: testObjectsFactory itemSellByTheStore) = 2.
 		! !
 
-!ShopTest methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 01:14:57'!
-test04
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:54:18'!
+test04PurchasesForClientCanBeListed
 	
-		| shop clientId clientPassword cartId sales |
+		| shop cartId sales |
 		
-		shop := Shop initializeWithCatalog: testObjectsFactory defaultCatalog andMerchantProcessor: self. 
-		
-		clientId := '001'.
-		clientPassword := '123'.
-		
-		testObjectsFactory setDebitResponse: [].
-		
-		cartId := shop createCartForClient: clientId password: clientPassword.
+		shop := testObjectsFactory createShop.
+				
+		cartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
 		
 		shop 	addToCart: cartId 
 				book: testObjectsFactory itemSellByTheStore 
-				quantity: 2.
+				quantity: 2
+				at: Time now.
 				
 		shop checkOutCart: cartId withCard: testObjectsFactory unexpiredCreditCard.
 		
-		sales := shop listPurchasesFor: clientId password: clientPassword.
+		sales := shop listPurchasesFor: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
 		
-		self assert: sales notEmpty.
-		self assert: sales first total = (testObjectsFactory itemSellByTheStorePrice * 2).
-		self assert: sales first items size = 2.
-		self assert: (sales first items occurrencesOf: testObjectsFactory itemSellByTheStore) = 2.
+		self assert: sales size = 1.
+		self assert: (sales at:testObjectsFactory itemSellByTheStore)  = 2 
 		! !
+
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:54:46'!
+test04PurchasesForClientCanBeListedForMultipleCarts
+	
+		| shop cartId sales anotherCartId|
+		
+		shop := testObjectsFactory createShop.
+				
+		cartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
+		
+		anotherCartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
+		
+		shop 	addToCart: cartId 
+				book: testObjectsFactory itemSellByTheStore 
+				quantity: 2
+				at: Time now.
+				
+	    shop 	addToCart: anotherCartId 
+				book: testObjectsFactory itemSellByTheStore 
+				quantity: 3
+				at: Time now.		
+				
+		shop checkOutCart: cartId withCard: testObjectsFactory unexpiredCreditCard.
+		shop checkOutCart: anotherCartId withCard: testObjectsFactory unexpiredCreditCard.
+		
+		sales := shop listPurchasesFor: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
+		
+		self assert: sales size = 1.
+		self assert: (sales at:testObjectsFactory itemSellByTheStore)  = 5
+		! !
+
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:54:29'!
+test04PurchasesForClientCanBeListedForMultipleCartsAndDifferentProducts
+	
+		| shop cartId sales anotherCartId|
+		
+		shop := testObjectsFactory createShop.
+				
+		cartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
+		
+		anotherCartId := shop createCartForClient: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
+		
+		shop 	addToCart: cartId 
+				book: testObjectsFactory itemSellByTheStore 
+				quantity: 2
+				at: Time now.
+				
+	     shop 	addToCart: anotherCartId 
+				book: testObjectsFactory anotherItemSellByTheStore 
+				quantity: 3
+				at: Time now.		
+				
+		shop checkOutCart: cartId withCard: testObjectsFactory unexpiredCreditCard.
+		shop checkOutCart: anotherCartId withCard: testObjectsFactory unexpiredCreditCard.
+		
+		sales := shop listPurchasesFor: testObjectsFactory validClientId password: testObjectsFactory validClientPass.
+		
+		self assert: sales size = 2.
+		self assert: (sales at:testObjectsFactory itemSellByTheStore)  = 2.
+		self assert: (sales at:testObjectsFactory anotherItemSellByTheStore)  = 3! !
+
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 15:11:22'!
+test05CreateCartForInvalidClientIdShouldRaiseError
+
+		| shop cartId|
+		
+		shop := testObjectsFactory createShop.				
+		
+		self
+			should: [ cartId := shop createCartForClient: 'invalidId' password: testObjectsFactory validClientPass.. ]
+			raise: Error - MessageNotUnderstood
+			withExceptionDo: [ :anError |	self assert: anError messageText = Shop invalidClientOrPasswordErrorMessage.
+											self assert: cartId = nil ].
+		! !
+
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 15:12:13'!
+test05CreateCartForInvalidPasswordShouldRaiseError
+
+		| shop cartId|
+		
+		shop := testObjectsFactory createShop.				
+		
+		self
+			should: [ cartId := shop createCartForClient: testObjectsFactory validClientId password: 'invalidPassword' ]
+			raise: Error - MessageNotUnderstood
+			withExceptionDo: [ :anError |	self assert: anError messageText = Shop invalidClientOrPasswordErrorMessage.
+											self assert: cartId = nil ].
+		! !
+
+!ShopTest methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:58:38'!
+test06CannotAccessCartAfter30Minutes
+
+		| shop cartId|
+		
+		shop := testObjectsFactory createShop.
+		
+		"la idea de este test es que hay qyue pasarle el momento de ahora mas 30 minutos"
+						
+		"
+		self
+			should: [ shop 	addToCart: cartId 
+				book: testObjectsFactory itemSellByTheStore 
+				quantity: 2
+				at: 'hora de ahora mas 30 minutos'.]
+			
+			raise: Error - MessageNotUnderstood
+			withExceptionDo: [ :anError |	self assert: anError messageText = Shop tooMuchTimePassedErrorMessage.
+											].
+		"! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -416,9 +512,9 @@ initializeAcceptingItemsOf: aCatalog andCartId: aCartId
 id
 	^ id.! !
 
-!Cart methodsFor: 'queries' stamp: 'MB 6/16/2018 20:39:48'!
+!Cart methodsFor: 'queries' stamp: 'pf 6/18/2018 14:16:49'!
 listItems
-	^ items.! !
+	^ items copy.! !
 
 !Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
 occurrencesOf: anItem
@@ -589,22 +685,24 @@ expiringOn: aMonth withNumber: aCreditCardNumber for: anOwner
 	^self new initializeExpiringOn: aMonth withNumber: aCreditCardNumber for: anOwner! !
 
 
-!classDefinition: #MonthOfYear category: #TusLibros!
-Object subclass: #MonthOfYear
-	instanceVariableNames: ''
+!classDefinition: #MerchantProcessorSimulator category: #TusLibros!
+Object subclass: #MerchantProcessorSimulator
+	instanceVariableNames: 'debitResponse'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 13:52:51'!
+debit: anAmount from: aCreditCard
+	^ debitResponse value.! !
 
-!classDefinition: 'MonthOfYear class' category: #TusLibros!
-MonthOfYear class
-	instanceVariableNames: ''!
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 13:59:06'!
+initialize
+	debitResponse := ['ok']! !
 
-!MonthOfYear class methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 6/17/2013 18:34'!
-of: aDate 
-	self shouldBeImplemented.! !
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 13:53:23'!
+setDebitResponse: aClosure
+ 	debitResponse := aClosure.! !
 
 
 !classDefinition: #Sale category: #TusLibros!
@@ -614,10 +712,11 @@ Object subclass: #Sale
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Sale methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 01:11:41'!
-items
+!Sale methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 14:49:28'!
+itemsDo: aClosure
 	
-	^ items! !
+	items do: aClosure.
+! !
 
 !Sale methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 6/17/2013 18:48'!
 total
@@ -646,22 +745,28 @@ ofItems: anItems withTotal: aTotal
 
 !classDefinition: #Shop category: #TusLibros!
 Object subclass: #Shop
-	instanceVariableNames: 'carts catalog cardIdCounter transactionIdCounter salesBook merchantProcessor'
+	instanceVariableNames: 'carts catalog cartIdCounter transactionIdCounter merchantProcessor clients salesBook lastAccessByCart'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:34:15'!
-addToCart: aCartId book: aBook quantity: aQuantity
-
-	self validCart: aCartId.
-
-	carts keysDo: [ :cart | cart id = aCartId ifTrue: [ cart add: aQuantity of: aBook ] ]! !
-
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:22:53'!
-carts
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:53:57'!
+addToCart: aCartId book: aBook quantity: aQuantity at: aMoment
 	
-	^ carts.! !
+	
+	self validCart: aCartId.
+	
+	(((aMoment - (lastAccessByCart at: aCartId)) seconds) > (30*60)) ifTrue: [self error: Shop tooMuchTimePassedErrorMessage].
+	
+
+	carts keysDo: [ :cart | cart id = aCartId ifTrue: [ cart add: aQuantity of: aBook ] ].
+	
+	lastAccessByCart at: aCartId put: aMoment.! !
+
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 13:21:41'!
+cartsAmount
+	
+	^ carts size! !
 
 !Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:07:54'!
 checkOutCart: aCartId withCard: aCreditCard
@@ -691,66 +796,83 @@ checkOutCart: aCartId withCard: aCreditCard
 	
 	! !
 
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:26:57'!
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:43:30'!
 createCartForClient: aClientId password: aPassword
 	
 	| cart cartId |
 	
-	cartId := cardIdCounter.
-	cardIdCounter := cardIdCounter + 1.
+	cartId := cartIdCounter.
+	cartIdCounter := cartIdCounter + 1.
 	
 	self validClient: aClientId password: aPassword.
 	
 	cart := Cart new initializeAcceptingItemsOf: catalog andCartId: cartId.
 	
-	cardIdCounter := cardIdCounter + 1.
-	
 	carts at: cart put: aClientId.
+	
+	lastAccessByCart at: cartId put: Time now.
 	
 	^ cartId.! !
 
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:39:07'!
-getCart: aCartId.
-
-	carts keysDo: [ :cart | cart id = aCartId ifTrue: [ ^ cart ]]
-! !
-
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:29:22'!
-initializeWithCatalog: aCatalog andMerchantProcessor: aMerchantProcessorInterface
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 16:41:25'!
+initializeWithCatalog: aCatalog andMerchantProcessor: aMerchantProcessorInterface forClients: clientsIdsAndPasswords 
 
 	carts := Dictionary new.
 	catalog := aCatalog.
-	cardIdCounter := 0.
+	cartIdCounter := 0.
 	transactionIdCounter := 0.
-	salesBook := Dictionary new.
 	merchantProcessor := aMerchantProcessorInterface.
+	clients := clientsIdsAndPasswords.
+	salesBook := Dictionary new.
+	lastAccessByCart  := Dictionary new.
 	! !
 
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/16/2018 23:26:22'!
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 14:17:04'!
 listCart: aCartId
 
 	self validCart: aCartId.
 
-	carts keysDo: [ :cart | cart id = aCartId ifTrue: [ ^ cart listItems ] ]! !
+	carts keysDo: [ :cart | cart id = aCartId ifTrue: [ ^ cart listItems copy ] ]! !
 
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/16/2018 23:24:43'!
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 14:50:13'!
 listPurchasesFor: aClientId password: aPassword
 
-	self validClient: aClientId password: aPassword.
-		
-	^ salesBook at: aClientId! !
+	|_salesBook result|
 
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/17/2018 00:30:05'!
+	self validClient: aClientId password: aPassword.
+			
+	_salesBook  := salesBook at: aClientId copy.
+	
+	result := Dictionary new.
+	
+	_salesBook do: [:sale | sale itemsDo: [:item | (result includesKey: item) ifTrue: [result at: item put: ((result at: item) + 1)] ifFalse:[result at: item put: 1]]].
+	
+	^result.	
+	
+	! !
+
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 14:10:10'!
+ocurrencesOf: aProduct for: aCartId
+	
+	|_cart|
+
+	carts keysDo: [ :cart | cart id = aCartId ifTrue: [_cart := cart]].
+	
+	^_cart occurrencesOf: aProduct! !
+
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 15:07:17'!
 validCart: aCartId.
 
 	(carts keys anySatisfy: [ :cart | cart id = aCartId ])
-		ifFalse: [ self error: self class invalidCart ].! !
+		ifFalse: [ self error: self class invalidCartErrorMessage ].! !
 
-!Shop methodsFor: 'as yet unclassified' stamp: 'MB 6/16/2018 23:26:32'!
+!Shop methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 15:09:48'!
 validClient: aClientId password: aPassword
 
-	(true)
-		ifFalse: [ self error: self class invalidClientOrPassword].! !
+	(clients includesKey: aClientId)ifFalse: [ self error: self class invalidClientOrPasswordErrorMessage].
+	
+	(clients at: aClientId) = aPassword
+		ifFalse: [ self error: self class invalidClientOrPasswordErrorMessage].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -758,19 +880,23 @@ validClient: aClientId password: aPassword
 Shop class
 	instanceVariableNames: ''!
 
-!Shop class methodsFor: 'as yet unclassified' stamp: 'MB 6/16/2018 20:38:01'!
-invalidCart
+!Shop class methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 15:04:22'!
+invalidCartErrorMessage
 	^ 'Cart invalido'! !
 
-!Shop class methodsFor: 'as yet unclassified' stamp: 'MB 6/16/2018 20:00:14'!
-invalidClientOrPassword
+!Shop class methodsFor: 'as yet unclassified' stamp: 'pf 6/18/2018 15:04:08'!
+invalidClientOrPasswordErrorMessage
 	^ 'Cliente Id o la contraseña no son validos'! !
 
 
-!Shop class methodsFor: 'instance creation' stamp: 'MB 6/17/2018 00:09:19'!
-initializeWithCatalog: aCatalog andMerchantProcessor: aMerchantProcessorInterface
-	
-	^ self new initializeWithCatalog: aCatalog andMerchantProcessor: aMerchantProcessorInterface.! !
+!Shop class methodsFor: 'instance creation' stamp: 'pf 6/18/2018 16:41:09'!
+initializeWithCatalog: aCatalog andMerchantProcessor: aMerchantProcessorInterface forClients: clientsIdsAndPasswords 
+	^ self new initializeWithCatalog: aCatalog andMerchantProcessor: aMerchantProcessorInterface forClients: clientsIdsAndPasswords.! !
+
+!Shop class methodsFor: 'instance creation' stamp: 'pf 6/18/2018 16:50:20'!
+tooMuchTimePassedErrorMessage
+
+	^'ya pasaron 30 minutios'! !
 
 
 !classDefinition: #StoreTestObjectsFactory category: #TusLibros!
@@ -785,12 +911,49 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog andCartId: '001'! !
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2013 18:08'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'pf 6/18/2018 16:42:10'!
+createShop
+	
+	^Shop initializeWithCatalog: self defaultCatalog andMerchantProcessor: (MerchantProcessorSimulator new) forClients: self shopClients.! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'pf 6/18/2018 14:54:43'!
 defaultCatalog
 	
 	^ Dictionary new
 		at: self itemSellByTheStore put: self itemSellByTheStorePrice;
+		at: self anotherItemSellByTheStore put: (self itemSellByTheStorePrice*2);
 		yourself ! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'pf 6/18/2018 14:01:03'!
+inValidClientId
+	
+	^2! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'pf 6/18/2018 14:01:15'!
+inValidClientPass
+	
+	^'invalidPass'! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'pf 6/18/2018 14:00:49'!
+shopClients
+	
+	|result|
+	
+	result := Dictionary new.
+	
+	result at: self validClientId put: self validClientPass.
+	
+	^result.! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'pf 6/18/2018 14:00:09'!
+validClientId
+	
+	^1! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'pf 6/18/2018 14:00:25'!
+validClientPass
+	
+	^'pass1'! !
 
 
 !StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'MB 6/11/2018 20:42:28'!
@@ -830,6 +993,11 @@ unexpiredCreditCard
 					withNumber: '0001' 
 					for: 'Owner'! !
 
+
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'pf 6/18/2018 14:55:08'!
+anotherItemSellByTheStore
+	
+	^ 'anotherValidBook'! !
 
 !StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
 itemNotSellByTheStore
